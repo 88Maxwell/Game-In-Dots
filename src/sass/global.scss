@@ -1,0 +1,19 @@
+html,
+body {
+    margin: 0px;
+    padding: 0px;
+    height: 100%;
+    overflow-x: hidden;
+    font: {
+        family: "JosefinSans";
+        size: 18px;
+        weight: 400;
+    }
+    line-height: 1.5;
+    color: $font;
+}
+
+@font-face {
+    font-family: "JosefinSans";
+    src: url("../fonts/JosefinSans-Regular.ttf");
+}

@@ -1,0 +1,33 @@
+image: node:11.1.0
+
+stages:
+    - setup
+    - test
+
+before_script:
+    - curl -o- -L https://yarnpkg.com/install.sh | bash
+    - export PATH="$HOME/.yarn/bin:$PATH"
+
+cache:
+    paths:
+        - node_modules/
+        - $HOME/.yarn-cache
+
+install-dependency:
+    stage: setup
+    script:
+        - yarn
+
+test-lint:
+    stage: test
+    script:
+        - yarn
+        - cp config/index.js.sample config/index.js
+        - yarn test:lint
+
+# security:
+#   stage: test
+#   script:
+#     - yarn
+#     - cp config/index.js.sample config/index.js
+#     - yarn test:security

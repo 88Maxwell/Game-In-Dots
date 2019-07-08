@@ -1,0 +1,27 @@
+.logo {
+    display: block;
+    width: 45px;
+    height: 45px;
+    background-size: cover;
+    background-repeat: no-repeat;
+    opacity: 0.8;
+
+    &:hover {
+        box-shadow: 1px 1px 1px rgba(white, 0.3);
+        background-color: #fff;
+        border-radius: 8px;
+        opacity: 1;
+    }
+
+    &--facebook {
+        background-image: url("../img/facebook.png");
+    }
+
+    &--linkedin {
+        background-image: url("../img/linkedin.png");
+    }
+
+    &--github {
+        background-image: url("../img/github.png");
+    }
+}

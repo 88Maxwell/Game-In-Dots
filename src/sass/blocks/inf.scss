@@ -1,0 +1,47 @@
+.inf {
+    @include mobile {
+        display: none;
+    }
+
+    @include desktop {
+        display: flex;
+        justify-content: space-between;
+        margin: 0 auto;
+        width: 100%;
+        font-size: 0.7rem;
+        
+        @include isGridSupported {
+            grid-template-columns: repeat(2, 1fr);
+            align-self: center;
+        }
+
+        &--smaller {
+            width: 85%;
+        }
+
+        &__right,
+        &__left {
+            width: 30%;
+            position: relative;
+            animation-delay: 0.25s;
+            animation-duration: 2s;
+            animation-timing-function: ease-out;
+
+            @include isGridSupported($grid: false) {
+                width: 60%;
+            }
+        }
+
+        &__right {
+            justify-self: end;
+            text-align: right;
+            animation-name: fromRightToLeft;
+        }
+
+        &__left {
+            justify-self: start;
+            text-align: left;
+            animation-name: fromLeftToRight;
+        }
+    }
+}

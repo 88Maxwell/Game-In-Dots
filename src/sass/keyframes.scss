@@ -1,0 +1,21 @@
+@keyframes fromLeftToRight {
+    from {
+        opacity: 0;
+        left: -33vw;
+    }
+    to {
+        opacity: 1;
+        left: 0;
+    }
+}
+
+@keyframes fromRightToLeft {
+    from {
+        opacity: 0;
+        right: -33vw;
+    }
+    to {
+        opacity: 1;
+        right: 0;
+    }
+}
