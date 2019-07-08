@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 // import PropTypes from "prop-types";
-// import { settings, winners } from "../api";
+import { settings as settingsApi, winners as winnersApi } from "../api";
 import Leaderboard from "./Leaderboard";
 import Game from "./Game";
 
@@ -8,22 +8,28 @@ export default class App extends Component {
     // static propTypes = {
     //     prop : PropTypes
     // }
-    async componentDidMount() {
-        console.log("qwrwetert");
-        // const settingsList = await settings.list();
-        // const winnersList = await winners.list();
+    state = {
+        winners  : [],
+        settings : []
+    }
 
-        // console.log(settingsList);
-        // console.log(winnersList);
+    // eslint-disable-next-line
+    async UNSAFE_componentWillMount() {
+        const settings = await settingsApi.list();
+        const winners = await winnersApi.list();
+
+        this.setState({ winners, settings });
     }
 
     render() {
-        console.log("object");
+        console.log(this.state);
+        const { settings, winners } = this.state;
+
 
         return (
             <div>
-                <Leaderboard />
-                <Game />
+                <Leaderboard winners={winners} />
+                <Game settings={settings} />
             </div>
         );
     }

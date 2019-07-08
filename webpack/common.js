@@ -11,7 +11,7 @@ module.exports = {
     module  : { rules: [ style(), eslint(), js(), images(), fonts() ] },
     resolve : {
         modules    : [ "src", "node_modules" ],
-        extensions : [ "*", ".js", ".jsx", ".css", ".scss" ]
+        extensions : [ "*", ".js", ".jsx", ".css", ".scss", ".sass" ]
     },
     plugins : [
         new webpack.ProgressPlugin(),

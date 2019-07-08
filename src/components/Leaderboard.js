@@ -15,6 +15,6 @@ function Leaderboard() {
     );
 }
 
-Leaderboard.propTypes = {};
+// Leaderboard.propTypes = {};
 
 export default Leaderboard;
