@@ -27,6 +27,6 @@ yarn.lock
 configs/*.js
 configs/*.json
 build
-
-# sapmles
-configs/*.js
+.cache
+build/
+__build/

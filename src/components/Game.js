@@ -1,16 +1,14 @@
-import React, { Component } from "react";
-// import PropTypes from "prop-types";
-import style from "./game.scss";
+import React from "react";
+import style from './game.module.css';
 
-export default class Game extends Component {
+// import PropTypes from "prop-types";
+export default class Game extends React.Component {
     // static propTypes = {
     //     prop: PropTypes
     // };
     render() {
-        console.log(style);
-
         return (
-            <section>
+            <section className={style.game}>
                 <h1>Main</h1>
                 <select> Pick game mode</select>
                 <input name="Name" placeholder="Enter your name" />

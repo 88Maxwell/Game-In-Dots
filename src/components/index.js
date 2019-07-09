@@ -1,17 +1,17 @@
-import React, { Component } from "react";
-// import PropTypes from "prop-types";
-import { settings as settingsApi, winners as winnersApi } from "../api";
-import Leaderboard from "./Leaderboard";
-import Game from "./Game";
+import React from "react";
 
-export default class App extends Component {
-    // static propTypes = {
-    //     prop : PropTypes
-    // }
+import { settings as settingsApi, winners as winnersApi } from "../api";
+
+import Game from './Game';
+import Leaderboard from './Leaderboard';
+
+import style from "./index.module.css";
+
+export default class App extends React.Component {
     state = {
-        winners  : [],
-        settings : []
-    }
+        winners: [],
+        settings: []
+    };
 
     // eslint-disable-next-line
     async UNSAFE_componentWillMount() {
@@ -22,15 +22,13 @@ export default class App extends Component {
     }
 
     render() {
-        console.log(this.state);
         const { settings, winners } = this.state;
 
-
         return (
-            <div>
-                <Leaderboard winners={winners} />
+            <main className={style.main}>
                 <Game settings={settings} />
-            </div>
+                <Leaderboard winners={winners} />
+            </main>
         );
     }
 }

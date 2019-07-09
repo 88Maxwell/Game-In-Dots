@@ -1,0 +1,6 @@
+.game {
+    display: flex;
+    background-color: #ccc;
+    padding: 15px;
+    margin: 15px 7.5px;
+}
