@@ -1,7 +1,6 @@
 .main {
     display: flex;
     justify-content: space-between;
-    background-color: red;
     padding: 15px;
     margin: 15px;
 }

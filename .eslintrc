@@ -1,3 +1,6 @@
 {
-    "extends": ["frontend"]
+    "extends": ["frontend"],
+    "rules": {
+        "react/no-did-mount-set-state": false
+    }
 }

@@ -1,0 +1,19 @@
+.square {
+    border-radius: 5px;
+    background-color: #FFF;
+    box-sizing: border-box;
+    border: 2.5px solid yellow;
+    font-size: 1rem;
+}
+
+.red {
+    background-color: red;
+}
+
+.blue {
+    background-color: blue;
+}
+
+.green {
+    background-color: green;
+}

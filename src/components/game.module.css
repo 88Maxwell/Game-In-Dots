@@ -1,6 +1,14 @@
 .game {
-    display: flex;
-    background-color: #ccc;
+    background-color: rgba(204, 204, 204, 0.5);
     padding: 15px;
     margin: 15px 7.5px;
+}
+
+.board {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 50vh;
+    height: 50vh;
 }
