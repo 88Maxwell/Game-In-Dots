@@ -3,16 +3,31 @@ import PropTypes from "prop-types";
 import style from "./square.module.css";
 
 function Square({ status, size }) {
-    const inlineStyle = {
-        width  : size,
-        height : size
-    };
+    let backgroundColor;
 
-    if (status) {
-        inlineStyle.backgroundColor = status === "computer" ? "red" : "green";
+    switch (status) {
+        case "ACTIVE":
+            backgroundColor = "blue";
+            break;
+
+        case "COMPUTER":
+            backgroundColor = "red";
+            break;
+
+        case "USER":
+            backgroundColor = "green";
+            break;
+        default:
+            break;
     }
 
-    return (<div style={{ ...inlineStyle }} className={style.square} />);
+    const inlineStyle = {
+        width  : size,
+        height : size,
+        backgroundColor
+    };
+
+    return (<div style={inlineStyle} className={style.square} />);
 }
 
 Square.propTypes = {
