@@ -179,6 +179,8 @@ export default class Game extends React.Component {
                 <div>
                     <h1>Game In Dots</h1>
                     <select
+                        name="Mode"
+                        aria-label="Game modes"
                         disabled={isDisabled}
                         value={mode ? mode : modes[0]}
                         onChange={this.handleChangeMode}
@@ -190,6 +192,8 @@ export default class Game extends React.Component {
                         ))}
                     </select>
                     <input
+                        name="Name"
+                        aria-label="Name of user"
                         required
                         disabled={isDisabled}
                         placeholder="Enter your name"
@@ -209,15 +213,15 @@ export default class Game extends React.Component {
                         : null
                     }
                     <ul className={style.board}>
-                        {board.map((square, index) => (
+                        {board && board.length ? board.map((square, index) => (
                             <Square
                                 size={`${100 / boardSize}%`}
                                 status={square.status}
                                 // eslint-disable-next-line
-                        key={index}
+                                key={index}
                                 handeClick={this.handleClick(index)}
                             />
-                        ))}
+                        )) : <li>Somethink happed 8(</li>}
                     </ul>
                 </div>
 
