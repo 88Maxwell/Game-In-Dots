@@ -1,4 +1,4 @@
-.leaderboard {
+.winnerboard {
     display: flex;
     flex-direction: column;
     background-color: rgba(204, 204, 204, 0.5);
@@ -8,18 +8,27 @@
     border-radius: 5px;
 }
 
-.leaderList {
+.winnerList {
     padding: 0;
+    padding-right: 15px;
     margin: 0;
     list-style-type: none;
+    max-height: 54vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
-.leaderItem {
+.winnerItem {
     display: flex;
     justify-content: space-between;
     width: 100%;
+    box-sizing: border-box;
     padding: 10px;
-    margin: 2.5px 5px;
+    margin: 15px 0;
     border: white solid 1px;
     border-radius: 5px;
+}
+
+.record {
+    margin: 0 10px;
 }

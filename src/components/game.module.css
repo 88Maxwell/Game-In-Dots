@@ -1,4 +1,6 @@
 .game {
+    border: white solid 2px;
+    border-radius: 5px;
     background-color: rgba(204, 204, 204, 0.5);
     padding: 15px;
     margin: 15px 7.5px;

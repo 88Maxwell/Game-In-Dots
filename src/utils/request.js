@@ -12,7 +12,7 @@ class API {
                     this.request({
                         url,
                         method : method.toUpperCase(),
-                        body   : { data }
+                        body   : data
                     }))
         );
     }

@@ -1,10 +1,16 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { settings as settingsApi } from "../api";
+import { getRandomInt, formatDate, fromCamelcaseToText } from "../utils/helpers";
 import Square from "./Square";
 
 import style from "./game.module.css";
 
 export default class Game extends React.Component {
+    static propTypes = {
+        handleAddWinner : PropTypes.func.isRequired
+    }
+
     state = {
         error      : "",
         isLoading  : true,
@@ -32,15 +38,10 @@ export default class Game extends React.Component {
         });
     }
 
-    handleChangeMode = evt => {
-        const { settings } = this.state;
-        const { value } = evt.target;
-
-        this.setState({
-            board : this.generateBoardMatrix(settings[value].field ** 2),
-            mode  : value
-        });
-    };
+    handleChangeMode = ({ target: { value } }) => this.setState({
+        board : this.generateBoardMatrix(this.state.settings[value].field ** 2),
+        mode  : value
+    });
 
     handleChange = param => evt => this.setState({ [param]: evt.target.value });
 
@@ -54,7 +55,6 @@ export default class Game extends React.Component {
         }
     };
 
-
     handleBreakGame = () => {
         const { mode, settings } = this.state;
 
@@ -66,16 +66,14 @@ export default class Game extends React.Component {
 
     handlePlay = () => {
         const { mode, settings } = this.state;
-        const { delay } = settings[mode];
 
         let isActive = true;
 
         this.setState({ isPlay: true }, () => {
-            const gameInteraval = setInterval(() => {
-                const { isPlay } = this.state;
+            const gameInteraval = setInterval(async () => {
+                const { isPlay, board } = this.state;
 
                 if (isPlay) {
-                    const { board } = this.state;
                     const newBoard = [ ...board ];
 
                     if (isActive) {
@@ -93,57 +91,53 @@ export default class Game extends React.Component {
                         this.setState({ board: newBoard });
                         isActive = false;
                     } else {
-                        const indexOfActiveSquare = newBoard.findIndex(
-                            el => el.status === "ACTIVE"
-                        );
+                        const indexOfActiveSquare = newBoard.findIndex(el => el.status === "ACTIVE");
 
                         if (indexOfActiveSquare !== -1) {
                             newBoard[indexOfActiveSquare].status = "COMPUTER";
                             this.setState({ board: newBoard });
                         }
-                        this.checkWinners(gameInteraval);
+                        await this.checkWinners(gameInteraval);
+
                         isActive = true;
                     }
                 } else {
                     clearInterval(gameInteraval);
                 }
-            }, delay / 20);
+            }, settings[mode].delay / 20);
         });
     };
 
-    checkWinners = gameInteraval => {
-        const { settings, mode, board, name } = this.state;
-        const { field } = settings[mode];
+
+    checkWinners =  async gameInteraval => {
+        const { settings, mode, name,  board } = this.state;
         const computerScore = this.pointOf("COMPUTER", board);
         const userScore = this.pointOf("USER", board);
-        const halfOfPoins = Math.floor(field ** 2 / 2);
-
+        const halfOfPoins = Math.floor(settings[mode].field ** 2 / 2);
 
         if (halfOfPoins < computerScore) {
-            clearInterval(gameInteraval);
-            this.setState({
-                winMessage  : "Computer is won !",
-                isFirstGame : false,
-                isPlay      : false,
-                board       : this.generateBoardMatrix(field ** 2)
-            });
+            await this.endGame("computer", gameInteraval);
         }
         if (halfOfPoins < userScore) {
-            clearInterval(gameInteraval);
-            this.setState({
-                winMessage  : `${name} is won !`,
-                isFirstGame : false,
-                isPlay      : false,
-                board       : this.generateBoardMatrix(field ** 2)
-            });
+            await this.endGame(name, gameInteraval);
         }
     };
 
+    async endGame(winner, gameInteraval) {
+        const { settings, mode } = this.state;
+        const { handleAddWinner } = this.props;
+
+        clearInterval(gameInteraval);
+        await handleAddWinner({ winner, date: formatDate(new Date()) });
+        this.setState({
+            winMessage : `${winner} is win!`,
+            isPlay     : false,
+            board      : this.generateBoardMatrix(settings[mode].field ** 2)
+        });
+    }
+
     pointOf = (who, board) =>
         board.reduce((accumalator, elem) => elem.status === who ? 1 + accumalator : accumalator, 0);
-
-    keyToReadebleFormat = key =>
-        key.replace(/\.?([A-Z])/g, (_, y) => ` ${y.toLowerCase()}`);
 
     generateBoardMatrix = countOfField =>
         Array.from(Array(countOfField)).map(() => ({ status: "PENDING" }));
@@ -191,7 +185,7 @@ export default class Game extends React.Component {
                     >
                         {modes.map(el => (
                             <option key={el} value={el}>
-                                {this.keyToReadebleFormat(el)}
+                                {fromCamelcaseToText(el)}
                             </option>
                         ))}
                     </select>
@@ -230,11 +224,4 @@ export default class Game extends React.Component {
             </section>
         ) : null;
     }
-}
-
-function getRandomInt(minimal, maximal) {
-    const min = Math.ceil(minimal);
-    const max = Math.floor(maximal);
-
-    return Math.floor(Math.random() * (max - min)) + min;
 }

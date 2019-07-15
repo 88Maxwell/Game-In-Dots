@@ -10,5 +10,5 @@ https://starnavi-frontend-test-task.herokuapp.com/
 <!-- - when a player or computer paints >50% of all possible squares in his color - he becomes the winner -->
 <!-- - an inscription appears between the control buttons and the playing field that the player (the name he entered) / computer won -->
 <!-- - button PLAY changes the caption to PLAY AGAIN -->
-- result of the game need to be send to server on this endpoint this-domain/winners in JSON with two fields winner and date both strings.
-- results in table should be auto update
+<!-- - result of the game need to be send to server on this endpoint this-domain/winners in JSON with two fields winner and date both strings. -->
+<!-- - results in table should be auto update -->
