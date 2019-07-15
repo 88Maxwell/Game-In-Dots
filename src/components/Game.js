@@ -104,7 +104,7 @@ export default class Game extends React.Component {
                 } else {
                     clearInterval(gameInteraval);
                 }
-            }, settings[mode].delay / 20);
+            }, settings[mode].delay);
         });
     };
 
