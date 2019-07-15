@@ -6,14 +6,14 @@ import style from "./game.module.css";
 
 export default class Game extends React.Component {
     state = {
-        error             : "",
-        isLoading         : true,
-        settings          : {},
-        mode              : "",
-        name              : "",
-        board             : [],
-        activeFieldNumber : null,
-        isPlay            : false
+        error      : "",
+        isLoading  : true,
+        settings   : {},
+        mode       : "",
+        name       : "",
+        board      : [],
+        isPlay     : false,
+        winMessage : ""
     };
 
     async componentDidMount() {
@@ -44,128 +44,191 @@ export default class Game extends React.Component {
 
     handleChange = param => evt => this.setState({ [param]: evt.target.value });
 
+    handleClick = elemIndex => () => {
+        const { board } = this.state;
+        const newBoard = [ ...board ];
+
+        if (newBoard[elemIndex].status === "ACTIVE") {
+            newBoard[elemIndex].status = "USER";
+            this.setState({ board: newBoard });
+        }
+    };
+
+
+    handleBreakGame = () => {
+        const { mode, settings } = this.state;
+
+        this.setState({
+            isPlay : false,
+            board  : this.generateBoardMatrix(settings[mode].field ** 2)
+        });
+    }
+
     handlePlay = () => {
         const { mode, settings } = this.state;
         const { delay } = settings[mode];
 
-        let light = true;
+        let isActive = true;
 
-        const gameInteraval = setInterval(() => {
-            const { board } = this.state;
-            const newBoard = [ ...board ];
+        this.setState({ isPlay: true }, () => {
+            const gameInteraval = setInterval(() => {
+                const { isPlay } = this.state;
 
+                if (isPlay) {
+                    const { board } = this.state;
+                    const newBoard = [ ...board ];
 
-            if (light) {
-                this.checkWinners(gameInteraval);
-                const indexesOfPending = [];
+                    if (isActive) {
+                        const indexesOfPending = [];
 
-                board.forEach((elem, index) => {
-                    if (elem.status === "PENDING") {
-                        indexesOfPending.push(index);
+                        board.forEach((elem, index) => {
+                            if (elem.status === "PENDING") {
+                                indexesOfPending.push(index);
+                            }
+                        });
+                        const indexOfRandomPending =
+                        indexesOfPending[getRandomInt(0, indexesOfPending.length)];
+
+                        newBoard[indexOfRandomPending].status = "ACTIVE";
+                        this.setState({ board: newBoard });
+                        isActive = false;
+                    } else {
+                        const indexOfActiveSquare = newBoard.findIndex(
+                            el => el.status === "ACTIVE"
+                        );
+
+                        if (indexOfActiveSquare !== -1) {
+                            newBoard[indexOfActiveSquare].status = "COMPUTER";
+                            this.setState({ board: newBoard });
+                        }
+                        this.checkWinners(gameInteraval);
+                        isActive = true;
                     }
-                });
-                const indexOfRandomPending =
-                    indexesOfPending[getRandomInt(0, indexesOfPending.length)];
-
-                newBoard[indexOfRandomPending].status = "ACTIVE";
-                this.setState({ board: newBoard });
-                light = false;
-            } else {
-                const indexOfActiveSquare = newBoard.findIndex(
-                    el => el.status === "ACTIVE"
-                );
-
-                if (indexOfActiveSquare !== -1) {
-                    newBoard[indexOfActiveSquare].status = "COMPUTER";
-                    this.setState({ board: newBoard });
+                } else {
+                    clearInterval(gameInteraval);
                 }
-                light = true;
-            }
-        }, delay / 4);
+            }, delay / 20);
+        });
+    };
+
+    checkWinners = gameInteraval => {
+        const { settings, mode, board, name } = this.state;
+        const { field } = settings[mode];
+        const computerScore = this.pointOf("COMPUTER", board);
+        const userScore = this.pointOf("USER", board);
+        const halfOfPoins = Math.floor(field ** 2 / 2);
+
+
+        if (halfOfPoins < computerScore) {
+            clearInterval(gameInteraval);
+            this.setState({
+                winMessage  : "Computer is won !",
+                isFirstGame : false,
+                isPlay      : false,
+                board       : this.generateBoardMatrix(field ** 2)
+            });
+        }
+        if (halfOfPoins < userScore) {
+            clearInterval(gameInteraval);
+            this.setState({
+                winMessage  : `${name} is won !`,
+                isFirstGame : false,
+                isPlay      : false,
+                board       : this.generateBoardMatrix(field ** 2)
+            });
+        }
     };
 
     pointOf = (who, board) =>
         board.reduce((accumalator, elem) => elem.status === who ? 1 + accumalator : accumalator, 0);
 
-    checkWinners = gameInteraval => {
-        const { settings, mode, board } = this.state;
-        const { field } = settings[mode];
-        const computerScore = this.pointOf("COMPUTER", board);
-        const userScore = this.pointOf("USER", board);
-
-        console.log(computerScore);
-        if (Math.floor((field ** 2) / 2) < computerScore) {
-            clearInterval(gameInteraval);
-            // eslint-disable-next-line
-            alert("YOU ARE LOSE");
-        } else if (Math.floor(field ** 2) < userScore) {
-            clearInterval(gameInteraval);
-            // eslint-disable-next-line
-            alert("YOU ARE WIN");
-        }
-    };
+    keyToReadebleFormat = key =>
+        key.replace(/\.?([A-Z])/g, (_, y) => ` ${y.toLowerCase()}`);
 
     generateBoardMatrix = countOfField =>
         Array.from(Array(countOfField)).map(() => ({ status: "PENDING" }));
 
-    generateGameBoard = () => {
-        const { isLoading, mode, name, board, settings, error } = this.state;
+    render() {
+        const {
+            isLoading,
+            isPlay,
+            mode,
+            name,
+            board,
+            settings,
+            error,
+            winMessage
+        } = this.state;
+
 
         if (isLoading) {
-            return <p>isLoading ...</p>;
+            return (
+                <section className={style.game}>
+                    <p>isLoading ...</p>;
+                </section>
+            );
         }
 
         if (error) {
-            return <p>{error}</p>;
+            return (
+                <section className={style.game}>
+                    <p>{error}</p>
+                </section>
+            );
         }
         const modes = settings && Object.keys(settings);
         const boardSize = settings[mode].field;
+        const isDisabled = isPlay ? "disabled" : "";
 
         return settings ? (
-            <>
-                <h1>Game</h1>
-                <select
-                    value={mode ? mode : modes[0]}
-                    onChange={this.handleChangeMode}
-                >
-                    {modes.map(el => (
-                        <option key={el} value={el}>
-                            {this.keyToReadebleFormat(el)}
-                        </option>
-                    ))}
-                </select>
-                <input
-                    name="Name"
-                    placeholder="Enter your name"
-                    onChange={this.handleChange("name")}
-                    value={name}
-                />
-                <button onClick={this.handlePlay}>Play</button>
-                <div className={style.board}>
-                    {board.map((square, index) => (
-                        <Square
-                            size={`${100 / boardSize}%`}
-                            status={square.status}
-                            // eslint-disable-next-line
-                            key={index}
-                        />
-                    ))}
+            <section className={style.game}>
+                <div>
+                    <h1>Game In Dots</h1>
+                    <select
+                        disabled={isDisabled}
+                        value={mode ? mode : modes[0]}
+                        onChange={this.handleChangeMode}
+                    >
+                        {modes.map(el => (
+                            <option key={el} value={el}>
+                                {this.keyToReadebleFormat(el)}
+                            </option>
+                        ))}
+                    </select>
+                    <input
+                        required
+                        disabled={isDisabled}
+                        placeholder="Enter your name"
+                        onChange={this.handleChange("name")}
+                        value={name}
+                    />
+                    {
+                        !isPlay
+                            ? <button disabled={!name} onClick={this.handlePlay}>{winMessage ? "PLAY AGAIN" : "PLAY" }</button>
+                            : <button onClick={this.handleBreakGame}>Break game</button>
+                    }
+
                 </div>
-            </>
-        ) : (
-            "empty"
-        );
-    };
+                <div>
+                    {!isPlay && winMessage
+                        ? <div className={style.winMessage}>{winMessage}</div>
+                        : null
+                    }
+                    <ul className={style.board}>
+                        {board.map((square, index) => (
+                            <Square
+                                size={`${100 / boardSize}%`}
+                                status={square.status}
+                                // eslint-disable-next-line
+                        key={index}
+                                handeClick={this.handleClick(index)}
+                            />
+                        ))}
+                    </ul>
+                </div>
 
-    keyToReadebleFormat = key =>
-        key.replace(/\.?([A-Z])/g, (_, y) => ` ${y.toLowerCase()}`);
-
-    render() {
-        // const { mode, settings } = this.state;
-
-        return (
-            <section className={style.game}>{this.generateGameBoard()}</section>
-        );
+            </section>
+        ) : null;
     }
 }
 

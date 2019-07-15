@@ -12,3 +12,12 @@
     width: 50vh;
     height: 50vh;
 }
+
+.winMessage {
+    display: flex;
+    justify-content: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    box-sizing: border-box;
+    padding: 20px;
+}

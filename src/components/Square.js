@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import style from "./square.module.css";
 
-function Square({ status, size }) {
+function Square({ status, size, handeClick }) {
     let backgroundColor;
 
     switch (status) {
@@ -27,12 +27,19 @@ function Square({ status, size }) {
         backgroundColor
     };
 
-    return (<div style={inlineStyle} className={style.square} />);
+    return (
+        <div
+            style={inlineStyle}
+            className={style.square}
+            onClick={handeClick}
+        />
+    );
 }
 
 Square.propTypes = {
-    status : PropTypes.string,
-    size   : PropTypes.string
+    handeClick : PropTypes.func.isRequired,
+    status     : PropTypes.string.isRequired,
+    size       : PropTypes.string.isRequired
 };
 
 export default Square;
