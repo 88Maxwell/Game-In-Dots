@@ -1,10 +1,10 @@
 {
     "name": "game",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "private": true,
     "scripts": {
-        "build": "MODE=production parcel build src/index.html -d build --public-url ./",
-        "dev": "MODE=development parcel --port 8000 src/index.html -d __build",
+        "build": "parcel build src/index.html -d build --public-url ./",
+        "dev": "parcel --port 8000 src/index.html -d __build",
         "test:lint": "MODE=test eslint src --ext js,jsx",
         "deploy": "gh-pages --remote origin -d build",
         "serve": "serve -s build"
