@@ -1,6 +1,7 @@
-# REQUIREMENTS 
+# Game in Dots
+<!-- # REQUIREMENTS  -->
 
-https://starnavi-frontend-test-task.herokuapp.com/
+<!-- https://starnavi-frontend-test-task.herokuapp.com/ -->
 
 <!-- - user set game difficulty and name -->
 <!-- - press PLAY -->
