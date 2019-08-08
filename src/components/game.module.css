@@ -1,3 +1,10 @@
+.main {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    margin: 15px;
+}
+
 .game {
     border: white solid 2px;
     border-radius: 5px;

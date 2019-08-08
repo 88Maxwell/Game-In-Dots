@@ -1,16 +1,13 @@
 import React from "react";
-import PropTypes from "prop-types";
-import { settings as settingsApi } from "../api";
-import { getRandomInt, formatDate, fromCamelcaseToText } from "../utils/helpers";
+
+import { settings } from "../../configs";
+import { getRandomInt, fromCamelcaseToText } from "../utils/helpers";
+
 import Square from "./Square";
 
 import style from "./game.module.css";
 
 export default class Game extends React.Component {
-    static propTypes = {
-        handleAddWinner : PropTypes.func.isRequired
-    }
-
     state = {
         error      : "",
         isLoading  : true,
@@ -23,11 +20,6 @@ export default class Game extends React.Component {
     };
 
     async componentDidMount() {
-        const settings = await settingsApi.list();
-
-        if (!settings) {
-            return this.setState({ error: "connection error" });
-        }
         const firstModeKey = Object.keys(settings)[0];
 
         this.setState({
@@ -56,7 +48,7 @@ export default class Game extends React.Component {
     };
 
     handleBreakGame = () => {
-        const { mode, settings } = this.state;
+        const { mode } = this.state;
 
         this.setState({
             isPlay : false,
@@ -65,7 +57,7 @@ export default class Game extends React.Component {
     }
 
     handlePlay = () => {
-        const { mode, settings } = this.state;
+        const { mode } = this.state;
 
         let isActive = true;
 
@@ -110,7 +102,7 @@ export default class Game extends React.Component {
 
 
     checkWinners =  async gameInteraval => {
-        const { settings, mode, name,  board } = this.state;
+        const { mode, name,  board } = this.state;
         const computerScore = this.pointOf("COMPUTER", board);
         const userScore = this.pointOf("USER", board);
         const halfOfPoins = Math.floor(settings[mode].field ** 2 / 2);
@@ -124,11 +116,9 @@ export default class Game extends React.Component {
     };
 
     async endGame(winner, gameInteraval) {
-        const { settings, mode } = this.state;
-        const { handleAddWinner } = this.props;
+        const { mode } = this.state;
 
         clearInterval(gameInteraval);
-        await handleAddWinner({ winner, date: formatDate(new Date()) });
         this.setState({
             winMessage : `${winner} is win!`,
             isPlay     : false,
@@ -149,7 +139,6 @@ export default class Game extends React.Component {
             mode,
             name,
             board,
-            settings,
             error,
             winMessage
         } = this.state;
@@ -175,57 +164,59 @@ export default class Game extends React.Component {
         const isDisabled = isPlay ? "disabled" : "";
 
         return settings ? (
-            <section className={style.game}>
-                <div>
-                    <h1>Game In Dots</h1>
-                    <select
-                        name="Mode"
-                        aria-label="Game modes"
-                        disabled={isDisabled}
-                        value={mode ? mode : modes[0]}
-                        onChange={this.handleChangeMode}
-                    >
-                        {modes.map(el => (
-                            <option key={el} value={el}>
-                                {fromCamelcaseToText(el)}
-                            </option>
-                        ))}
-                    </select>
-                    <input
-                        name="Name"
-                        aria-label="Name of user"
-                        required
-                        disabled={isDisabled}
-                        placeholder="Enter your name"
-                        onChange={this.handleChange("name")}
-                        value={name}
-                    />
-                    {
-                        !isPlay
-                            ? <button disabled={!name} onClick={this.handlePlay}>{winMessage ? "PLAY AGAIN" : "PLAY" }</button>
-                            : <button onClick={this.handleBreakGame}>Break game</button>
-                    }
+            <main className={style.main}>
+                <section className={style.game}>
+                    <div>
+                        <h1>Game In Dots</h1>
+                        <select
+                            name="Mode"
+                            aria-label="Game modes"
+                            disabled={isDisabled}
+                            value={mode ? mode : modes[0]}
+                            onChange={this.handleChangeMode}
+                        >
+                            {modes.map(el => (
+                                <option key={el} value={el}>
+                                    {fromCamelcaseToText(el)}
+                                </option>
+                            ))}
+                        </select>
+                        <input
+                            name="Name"
+                            aria-label="Name of user"
+                            required
+                            disabled={isDisabled}
+                            placeholder="Enter your name"
+                            onChange={this.handleChange("name")}
+                            value={name}
+                        />
+                        {
+                            !isPlay
+                                ? <button disabled={!name} onClick={this.handlePlay}>{winMessage ? "PLAY AGAIN" : "PLAY" }</button>
+                                : <button onClick={this.handleBreakGame}>Break game</button>
+                        }
 
-                </div>
-                <div>
-                    {!isPlay && winMessage
-                        ? <div className={style.winMessage}>{winMessage}</div>
-                        : null
-                    }
-                    <ul className={style.board}>
-                        {board && board.length ? board.map((square, index) => (
-                            <Square
-                                size={`${100 / boardSize}%`}
-                                status={square.status}
-                                // eslint-disable-next-line
+                    </div>
+                    <div>
+                        {!isPlay && winMessage
+                            ? <div className={style.winMessage}>{winMessage}</div>
+                            : null
+                        }
+                        <ul className={style.board}>
+                            {board && board.length ? board.map((square, index) => (
+                                <Square
+                                    size={`${100 / boardSize}%`}
+                                    status={square.status}
+                                    // eslint-disable-next-line
                                 key={index}
-                                handeClick={this.handleClick(index)}
-                            />
-                        )) : <li>Somethink happed 8(</li>}
-                    </ul>
-                </div>
+                                    handeClick={this.handleClick(index)}
+                                />
+                            )) : <li>Somethink happed 8(</li>}
+                        </ul>
+                    </div>
 
-            </section>
+                </section>
+            </main>
         ) : null;
     }
 }
