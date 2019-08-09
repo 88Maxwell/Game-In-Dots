@@ -5,6 +5,12 @@
     margin: 15px;
 }
 
+.header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .game {
     border: white solid 2px;
     border-radius: 5px;
@@ -18,15 +24,19 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    width: 50vh;
-    height: 50vh;
+  
 }
 
-.winMessage {
-    display: flex;
-    justify-content: center;
-    font-weight: bold;
-    text-transform: uppercase;
-    box-sizing: border-box;
-    padding: 20px;
+@media only screen and (orientation: landscape) {
+    .board {
+        width: 70vh;
+        height: 70vh;
+    }
+}
+
+@media only screen and (orientation: portrait) {
+    .board {
+        width: 80vw;
+        height: 80vw;
+    }
 }

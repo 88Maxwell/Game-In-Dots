@@ -8,32 +8,22 @@ import Square from "./Square";
 import style from "./game.module.css";
 
 export default class Game extends React.Component {
-    state = {
-        error      : "",
-        isLoading  : true,
-        settings   : {},
-        mode       : "",
-        name       : "",
-        board      : [],
-        isPlay     : false,
-        winMessage : ""
-    };
-
-    async componentDidMount() {
+    constructor() {
+        super();
         const firstModeKey = Object.keys(settings)[0];
 
-        this.setState({
-            settings,
-            mode      : firstModeKey,
-            board     : this.generateBoardMatrix(settings[firstModeKey].field ** 2),
-            isLoading : false
-        });
+        this.state = {
+            mode   : firstModeKey,
+            board  : this.generateBoardMatrix(settings[firstModeKey].field ** 2),
+            isPlay : false
+        };
     }
 
-    handleChangeMode = ({ target: { value } }) => this.setState({
-        board : this.generateBoardMatrix(this.state.settings[value].field ** 2),
-        mode  : value
-    });
+    handleChangeMode = ({ target: { value } }) =>
+        this.setState({
+            board : this.generateBoardMatrix(settings[value].field ** 2),
+            mode  : value
+        });
 
     handleChange = param => evt => this.setState({ [param]: evt.target.value });
 
@@ -47,21 +37,16 @@ export default class Game extends React.Component {
         }
     };
 
-    handleBreakGame = () => {
-        const { mode } = this.state;
-
+    handleBreakGame = () =>
         this.setState({
             isPlay : false,
-            board  : this.generateBoardMatrix(settings[mode].field ** 2)
+            board  : this.generateBoardMatrix(settings[this.state.mode].field ** 2)
         });
-    }
 
-    handlePlay = () => {
-        const { mode } = this.state;
-
-        let isActive = true;
-
+    handlePlay = () =>
         this.setState({ isPlay: true }, () => {
+            let isActive = true;
+
             const gameInteraval = setInterval(async () => {
                 const { isPlay, board } = this.state;
 
@@ -76,8 +61,7 @@ export default class Game extends React.Component {
                                 indexesOfPending.push(index);
                             }
                         });
-                        const indexOfRandomPending =
-                        indexesOfPending[getRandomInt(0, indexesOfPending.length)];
+                        const indexOfRandomPending = indexesOfPending[getRandomInt(0, indexesOfPending.length)];
 
                         newBoard[indexOfRandomPending].status = "ACTIVE";
                         this.setState({ board: newBoard });
@@ -96,126 +80,94 @@ export default class Game extends React.Component {
                 } else {
                     clearInterval(gameInteraval);
                 }
-            }, settings[mode].delay);
+            }, settings[this.state.mode].delay);
         });
-    };
 
-
-    checkWinners =  async gameInteraval => {
-        const { mode, name,  board } = this.state;
+    checkWinners = async gameInteraval => {
+        const { mode, board } = this.state;
         const computerScore = this.pointOf("COMPUTER", board);
         const userScore = this.pointOf("USER", board);
-        const halfOfPoins = Math.floor(settings[mode].field ** 2 / 2);
+        const boardSize = settings[mode].field ** 2;
+        const halfOfPoins = Math.floor(boardSize / 2);
+        const is = {
+            draw  : halfOfPoins === computerScore && halfOfPoins === userScore && halfOfPoins * 2 === boardSize,
+            loose : halfOfPoins < computerScore,
+            win   : halfOfPoins < userScore
+        };
 
-        if (halfOfPoins < computerScore) {
-            await this.endGame("computer", gameInteraval);
-        }
-        if (halfOfPoins < userScore) {
-            await this.endGame(name, gameInteraval);
+        let finalMessage = "";
+
+        if (is.draw || is.loose || is.win) {
+            if (is.draw) {
+                finalMessage = "Draw !";
+            }
+            if (is.loose) {
+                finalMessage = "You are loose!";
+            }
+            if (is.win) {
+                finalMessage = "You are win!";
+            }
+            clearInterval(gameInteraval);
+
+            // eslint-disable-next-line
+            alert(finalMessage);
+
+            this.setState({
+                isPlay : false,
+                board  : this.generateBoardMatrix(boardSize)
+            });
         }
     };
 
-    async endGame(winner, gameInteraval) {
-        const { mode } = this.state;
-
-        clearInterval(gameInteraval);
-        this.setState({
-            winMessage : `${winner} is win!`,
-            isPlay     : false,
-            board      : this.generateBoardMatrix(settings[mode].field ** 2)
-        });
-    }
-
     pointOf = (who, board) =>
-        board.reduce((accumalator, elem) => elem.status === who ? 1 + accumalator : accumalator, 0);
+        board.reduce((accumalator, elem) => (elem.status === who ? 1 + accumalator : accumalator), 0);
 
-    generateBoardMatrix = countOfField =>
-        Array.from(Array(countOfField)).map(() => ({ status: "PENDING" }));
+    generateBoardMatrix = countOfField => Array.from(Array(countOfField)).map(() => ({ status: "PENDING" }));
 
     render() {
-        const {
-            isLoading,
-            isPlay,
-            mode,
-            name,
-            board,
-            error,
-            winMessage
-        } = this.state;
+        const { isPlay, mode, board } = this.state;
 
-
-        if (isLoading) {
-            return (
-                <section className={style.game}>
-                    <p>isLoading ...</p>;
-                </section>
-            );
-        }
-
-        if (error) {
-            return (
-                <section className={style.game}>
-                    <p>{error}</p>
-                </section>
-            );
-        }
-        const modes = settings && Object.keys(settings);
+        const modes = Object.keys(settings);
         const boardSize = settings[mode].field;
-        const isDisabled = isPlay ? "disabled" : "";
 
         return settings ? (
-            <main className={style.main}>
-                <section className={style.game}>
-                    <div>
-                        <h1>Game In Dots</h1>
-                        <select
-                            name="Mode"
-                            aria-label="Game modes"
-                            disabled={isDisabled}
-                            value={mode ? mode : modes[0]}
-                            onChange={this.handleChangeMode}
-                        >
-                            {modes.map(el => (
-                                <option key={el} value={el}>
-                                    {fromCamelcaseToText(el)}
-                                </option>
-                            ))}
-                        </select>
-                        <input
-                            name="Name"
-                            aria-label="Name of user"
-                            required
-                            disabled={isDisabled}
-                            placeholder="Enter your name"
-                            onChange={this.handleChange("name")}
-                            value={name}
-                        />
-                        {
-                            !isPlay
-                                ? <button disabled={!name} onClick={this.handlePlay}>{winMessage ? "PLAY AGAIN" : "PLAY" }</button>
-                                : <button onClick={this.handleBreakGame}>Break game</button>
-                        }
-
-                    </div>
-                    <div>
-                        {!isPlay && winMessage
-                            ? <div className={style.winMessage}>{winMessage}</div>
-                            : null
-                        }
-                        <ul className={style.board}>
-                            {board && board.length ? board.map((square, index) => (
-                                <Square
-                                    size={`${100 / boardSize}%`}
-                                    status={square.status}
-                                    // eslint-disable-next-line
-                                key={index}
-                                    handeClick={this.handleClick(index)}
-                                />
-                            )) : <li>Somethink happed 8(</li>}
-                        </ul>
-                    </div>
-
-                </section>
+            <main className={style.game}>
+                <header  className={style.header}>
+                    <h1>Game In Dots</h1>
+                    <select
+                        name="Mode"
+                        aria-label="Game modes"
+                        disabled={isPlay ? "disabled" : ""}
+                        value={mode ? mode : modes[0]}
+                        onChange={this.handleChangeMode}
+                    >
+                        {modes.map(el => (
+                            <option key={el} value={el}>
+                                {fromCamelcaseToText(el)}
+                            </option>
+                        ))}
+                    </select>
+                    {!isPlay ? (
+                        <button onClick={this.handlePlay}>PLAY</button>
+                    ) : (
+                        <button onClick={this.handleBreakGame}>Break game</button>
+                    )}
+                </header>
+                <ul className={style.board}>
+                    {board && board.length ? (
+                        board.map((square, index) => (
+                            <Square
+                                size={`${100 / boardSize}%`}
+                                status={square.status}
+                                // eslint-disable-next-line
+                                        key={index}
+                                handeClick={this.handleClick(index)}
+                            />
+                        ))
+                    ) : (
+                        <li>Somethink happed 8(</li>
+                    )}
+                </ul>
             </main>
         ) : null;
     }
