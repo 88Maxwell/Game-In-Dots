@@ -22,7 +22,7 @@ test-lint:
     stage: test
     script:
         - yarn
-        - cp config/index.js.sample config/index.js
+        - cp configs/index.js.sample configs/index.js
         - yarn test:lint
 
 # security:
