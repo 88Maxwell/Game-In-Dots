@@ -28,7 +28,7 @@ function Square({ status, size, handeClick }) {
     };
 
     return (
-        <div
+        <li
             style={inlineStyle}
             className={style.square}
             onClick={handeClick}
