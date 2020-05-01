@@ -1,7 +1,7 @@
 {
     "short_name": "Game-in-dots",
     "name": "Game-in-dots",
-    "start_url": ".",
+    "start_url": "/Game-In-Dots/index.html",
     "icons": [
         {
             "src": "assets/ico512.png",
@@ -19,7 +19,6 @@
     "background_color": "#333",
     "dir": "ltr",
     "lang": "en",
-    "scope": "/",
     "description": "",
     "orientation": "any",
     "related_applications": [],
