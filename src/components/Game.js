@@ -7,7 +7,7 @@ import { getRandomInt, fromCamelcaseToText } from "../utils/helpers";
 import Square from "./Square";
 
 import style from "./game.module.css";
-
+import titleStyle from "./gameTitle.module.css";
 
 const PLAYERS = {
     USER     : "USER",
@@ -123,13 +123,14 @@ function Game() {
     return settings ? (
         <main className={style.game}>
             <header className={style.header}>
-                <h1>Game In Dots</h1>
+                <h1 className={titleStyle.title}>Game In Dots</h1>
                 <select
                     name="Mode"
                     aria-label="Game modes"
                     disabled={isPlay ? "disabled" : null}
                     value={mode || modes[0]}
                     onChange={handleChangeMode}
+                    className={style.select}
                 >
                     {modes.map((el) => (
                         <option key={el} value={el}>
@@ -138,11 +139,19 @@ function Game() {
                     ))}
                 </select>
                 {!isPlay ? (
-                    <button type="button" onClick={handlePlay}>
+                    <button
+                        className={style.playButton}
+                        type="button"
+                        onClick={handlePlay}
+                    >
                         PLAY
                     </button>
                 ) : (
-                    <button type="button" onClick={handleBreakGame}>
+                    <button
+                        className={style.playButton}
+                        type="button"
+                        onClick={handleBreakGame}
+                    >
                         Break game
                     </button>
                 )}
@@ -153,6 +162,7 @@ function Game() {
                         <Square
                             size={`${100 / boardSize}%`}
                             status={square.status}
+                            number={index + 1}
                             key={index.toString()}
                             handeClick={handleClick(index)}
                         />

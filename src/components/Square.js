@@ -2,7 +2,9 @@ import React from "react";
 import PropTypes from "prop-types";
 import style from "./square.module.css";
 
-function Square({ status, size, handeClick }) {
+function Square({
+    number, status, size, handeClick
+}) {
     let backgroundColor;
 
     switch (status) {
@@ -21,19 +23,29 @@ function Square({ status, size, handeClick }) {
             break;
     }
 
-    const inlineStyle = {
-        width  : size,
-        height : size,
-        backgroundColor
-    };
-
-    // eslint-disable-next-line
-    return <li style={inlineStyle} className={style.square} onClick={handeClick} />; // TODO enable eslint for this line
+    return (
+        <li
+            style={{
+                width  : size,
+                height : size
+            }}
+            className={style.listItem}
+        >
+            <button
+                style={{ backgroundColor }}
+                type="button"
+                className={style.button}
+                aria-label={`square-${number}`}
+                onClick={handeClick}
+            />
+        </li>
+    );
 }
 
 Square.propTypes = {
     handeClick : PropTypes.func.isRequired,
     status     : PropTypes.string.isRequired,
+    number     : PropTypes.number.isRequired,
     size       : PropTypes.string.isRequired
 };
 

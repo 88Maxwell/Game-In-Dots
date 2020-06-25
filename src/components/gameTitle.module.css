@@ -1,0 +1,62 @@
+.title {
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 2.5em;
+    font-weight: 800;
+    letter-spacing: 5px;
+    line-height: 1;
+    text-shadow: #ededed00 10px 10px 0;
+    position: relative;
+}
+.title:after {
+    content: "Game In Dots";
+    position: absolute;
+    right: 0px;
+    left: 20px;
+    top: 5px;
+}
+.title:after {
+    background-image: -webkit-linear-gradient(
+        left top,
+        transparent 0%,
+        transparent 25%,
+        #555 25%,
+        #555 50%,
+        transparent 50%,
+        transparent 75%,
+        #555 75%
+    );
+    
+    background-size: 4px 4px;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    z-index: -5;
+    display: block;
+    text-shadow: none;
+}
+.title:before {
+    content: "Game In Dots";
+    position: absolute;
+    right: 20px;
+    left: 0;
+    bottom: 5px;
+}
+
+.title:before {
+    background-image: -webkit-linear-gradient(
+        left top,
+        transparent 0%,
+        transparent 25%,
+        #555 25%,
+        #555 50%,
+        transparent 50%,
+        transparent 75%,
+        #555 75%
+    );
+    background-size: 4px 4px;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    z-index: -5;
+    display: block;
+    text-shadow: none;
+}

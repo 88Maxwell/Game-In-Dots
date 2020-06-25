@@ -1,6 +1,6 @@
 .main {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     padding: 15px;
     margin: 15px;
 }
@@ -12,11 +12,49 @@
 }
 
 .game {
-    border: white solid 2px;
     border-radius: 5px;
-    background-color: rgba(204, 204, 204, 0.5);
     padding: 15px;
+    position: absolute;
+    box-shadow: 0 0 15px rgba(139, 139, 139, 0.15);
     margin: 15px 7.5px;
+    transform: translate(-50%, -50%);
+    background: inherit;
+    z-index: 2;
+}
+
+.game::before {
+    content: "";
+    background-color: rgba(58, 35, 10, 0.5);
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    box-shadow: inset 0 200px rgba(255, 255, 255, 0.05);
+    filter: blur(10px);
+    z-index: -1;
+}
+
+.select {
+    margin-bottom: 10px;
+    font-weight: bold;
+    box-sizing: border-box;
+    padding: 10px 0;
+    border-radius: 10px;
+}
+
+.playButton {
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    box-sizing: border-box;
+    font-weight: bold;
+    padding: 10px 0;
+    border: none;
+    border-radius: 10px;
+}
+.playButton:focus {
+    outline: none;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7) inset;
 }
 
 .board {
@@ -24,7 +62,6 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-  
 }
 
 @media only screen and (orientation: landscape) {
