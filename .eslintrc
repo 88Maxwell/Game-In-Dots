@@ -1,6 +1,3 @@
 {
-    "extends": ["frontend"],
-    "rules": {
-        "react/no-did-mount-set-state": false
-    }
+    "extends": ["airbnb", "frontend"]
 }

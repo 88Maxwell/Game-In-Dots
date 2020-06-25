@@ -1,3 +1,4 @@
+/* eslint-disable */
 // This is the "Offline copy of assets" service worker
 
 const CACHE = "pwabuilder-offline";

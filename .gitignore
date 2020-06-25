@@ -27,3 +27,4 @@ build
 .cache
 build/
 __build/
+src/configs/*.sample

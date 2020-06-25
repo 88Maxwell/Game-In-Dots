@@ -5,5 +5,4 @@ export const getRandomInt = (minimal, maximal) => {
     return Math.floor(Math.random() * (max - min)) + min;
 };
 
-export const fromCamelcaseToText = key =>
-    key.replace(/\.?([A-Z])/g, (_, y) => ` ${y.toLowerCase()}`);
+export const fromCamelcaseToText = key => key.replace(/\.?([A-Z])/g, (_, y) => ` ${y.toLowerCase()}`);

@@ -1,174 +1,168 @@
-import React from "react";
+import React, {
+    useEffect, useCallback, useState, useMemo
+} from "react";
 
-import { settings } from "../../configs";
+import { settings } from "../configs";
 import { getRandomInt, fromCamelcaseToText } from "../utils/helpers";
-
 import Square from "./Square";
 
 import style from "./game.module.css";
 
-export default class Game extends React.Component {
-    constructor() {
-        super();
-        const firstModeKey = Object.keys(settings)[0];
 
-        this.state = {
-            mode   : firstModeKey,
-            board  : this.generateBoardMatrix(settings[firstModeKey].field ** 2),
-            isPlay : false
-        };
-    }
+const PLAYERS = {
+    USER     : "USER",
+    COMPUTER : "COMPUTER"
+};
 
-    handleChangeMode = ({ target: { value } }) =>
-        this.setState({
-            board : this.generateBoardMatrix(settings[value].field ** 2),
-            mode  : value
-        });
+const GAME_STATUS = {
+    PENDING : "PENDING",
+    ACTIVE  : "ACTIVE"
+};
 
-    handleChange = param => evt => this.setState({ [param]: evt.target.value });
+// eslint-disable-next-line max-len
+const generateBoardMatrix = (countOfField) => Array.from(Array(countOfField)).map(() => ({ status: GAME_STATUS.PENDING }));
+const modes = Object.keys(settings);
 
-    handleClick = elemIndex => () => {
-        const { board } = this.state;
-        const newBoard = [ ...board ];
+function Game() {
+    const [ mode, setMode ] = useState(modes[0]);
+    const boardSize = useMemo(() => settings[mode].field, [ mode ]);
+    const [ board, setBoard ] = useState(generateBoardMatrix(boardSize ** 2));
+    const [ isActive, setIsActive ] = useState(false);
+    const [ isPlay, setIsPlay ] = useState(false);
 
-        if (newBoard[elemIndex].status === "ACTIVE") {
-            newBoard[elemIndex].status = "USER";
-            this.setState({ board: newBoard });
-        }
-    };
+    const pointOf = useCallback((who) => board.reduce((acc, elem) => (elem.status === who ? 1 + acc : acc), 0), [
+        board
+    ]);
 
-    handleBreakGame = () =>
-        this.setState({
-            isPlay : false,
-            board  : this.generateBoardMatrix(settings[this.state.mode].field ** 2)
-        });
-
-    handlePlay = () =>
-        this.setState({ isPlay: true }, () => {
-            let isActive = true;
-
-            const gameInteraval = setInterval(async () => {
-                const { isPlay, board } = this.state;
-
-                if (isPlay) {
-                    const newBoard = [ ...board ];
-
-                    if (isActive) {
-                        const indexesOfPending = [];
-
-                        board.forEach((elem, index) => {
-                            if (elem.status === "PENDING") {
-                                indexesOfPending.push(index);
-                            }
-                        });
-                        const indexOfRandomPending = indexesOfPending[getRandomInt(0, indexesOfPending.length)];
-
-                        newBoard[indexOfRandomPending].status = "ACTIVE";
-                        this.setState({ board: newBoard });
-                        isActive = false;
-                    } else {
-                        const indexOfActiveSquare = newBoard.findIndex(el => el.status === "ACTIVE");
-
-                        if (indexOfActiveSquare !== -1) {
-                            newBoard[indexOfActiveSquare].status = "COMPUTER";
-                            this.setState({ board: newBoard });
-                        }
-                        await this.checkWinners(gameInteraval);
-
-                        isActive = true;
-                    }
-                } else {
-                    clearInterval(gameInteraval);
-                }
-            }, settings[this.state.mode].delay);
-        });
-
-    checkWinners = async gameInteraval => {
-        const { mode, board } = this.state;
-        const computerScore = this.pointOf("COMPUTER", board);
-        const userScore = this.pointOf("USER", board);
-        const boardSize = settings[mode].field ** 2;
-        const halfOfPoins = Math.floor(boardSize / 2);
+    const getGameResult = useCallback(() => {
+        const computerScore = pointOf(PLAYERS.COMPUTER, board);
+        const userScore = pointOf(PLAYERS.USER, board);
+        const halfOfPoins = Math.floor(boardSize ** 2 / 2);
         const is = {
             draw  : halfOfPoins === computerScore && halfOfPoins === userScore && halfOfPoins * 2 === boardSize,
             loose : halfOfPoins < computerScore,
             win   : halfOfPoins < userScore
         };
 
-        let finalMessage = "";
+        if (is.draw) return { done: true, message: "Draw !" };
+        if (is.loose) return { done: true, message: "You are loose!" };
+        if (is.win) return { done: true, message: "You are win!" };
 
-        if (is.draw || is.loose || is.win) {
-            if (is.draw) {
-                finalMessage = "Draw !";
+        return { done: false };
+    }, [ board ]);
+
+    useEffect(() => {
+        const gameInteraval = setInterval(() => {
+            if (isPlay) {
+                const newBoard = [ ...board ];
+
+                if (isActive) {
+                    const { message, done } = getGameResult();
+
+                    if (done) {
+                        clearInterval(gameInteraval);
+                        // eslint-disable-next-line
+                        alert(message);
+                        setIsPlay(false);
+                        setBoard(generateBoardMatrix(boardSize ** 2));
+                    } else {
+                        const indexesOfPending = [];
+
+                        // eslint-disable-next-line max-len
+                        board.forEach((elem, index) => (elem.status === GAME_STATUS.PENDING ? indexesOfPending.push(index) : null));
+
+                        const indexOfRandomPending = indexesOfPending[getRandomInt(0, indexesOfPending.length)];
+
+                        newBoard[indexOfRandomPending].status = GAME_STATUS.ACTIVE;
+                        setBoard(newBoard);
+                        setIsActive(false);
+                    }
+                } else {
+                    const indexOfActiveSquare = newBoard.findIndex((el) => el.status === GAME_STATUS.ACTIVE);
+
+                    if (indexOfActiveSquare !== -1) {
+                        newBoard[indexOfActiveSquare].status = PLAYERS.COMPUTER;
+                        setBoard(newBoard);
+                    }
+
+                    setIsActive(true);
+                }
+            } else clearInterval(gameInteraval);
+        }, settings[mode].delay);
+
+        return () => clearInterval(gameInteraval);
+    }, [ isPlay, isActive, board ]);
+
+    const handlePlay = useCallback(() => setIsPlay(true), [ isPlay, setIsPlay ]);
+
+    const handleClick = useCallback(
+        (elemIndex) => () => {
+            if (board[elemIndex].status === GAME_STATUS.ACTIVE) {
+                const newBoard = [ ...board ];
+
+                newBoard[elemIndex].status = PLAYERS.USER;
+                setBoard(newBoard);
             }
-            if (is.loose) {
-                finalMessage = "You are loose!";
-            }
-            if (is.win) {
-                finalMessage = "You are win!";
-            }
-            clearInterval(gameInteraval);
+        },
+        [ board ]
+    );
 
-            // eslint-disable-next-line
-            alert(finalMessage);
+    const handleBreakGame = useCallback(() => {
+        setIsPlay(false);
+        setBoard(generateBoardMatrix(settings[mode].field ** 2));
+    }, [ setIsPlay, setBoard, mode ]);
 
-            this.setState({
-                isPlay : false,
-                board  : this.generateBoardMatrix(boardSize)
-            });
-        }
-    };
+    const handleChangeMode = useCallback(
+        ({ target: { value } }) => {
+            setBoard(generateBoardMatrix(settings[value].field ** 2));
+            setMode(value);
+        },
+        [ board, mode ]
+    );
 
-    pointOf = (who, board) =>
-        board.reduce((accumalator, elem) => (elem.status === who ? 1 + accumalator : accumalator), 0);
-
-    generateBoardMatrix = countOfField => Array.from(Array(countOfField)).map(() => ({ status: "PENDING" }));
-
-    render() {
-        const { isPlay, mode, board } = this.state;
-
-        const modes = Object.keys(settings);
-        const boardSize = settings[mode].field;
-
-        return settings ? (
-            <main className={style.game}>
-                <header  className={style.header}>
-                    <h1>Game In Dots</h1>
-                    <select
-                        name="Mode"
-                        aria-label="Game modes"
-                        disabled={isPlay ? "disabled" : ""}
-                        value={mode ? mode : modes[0]}
-                        onChange={this.handleChangeMode}
-                    >
-                        {modes.map(el => (
-                            <option key={el} value={el}>
-                                {fromCamelcaseToText(el)}
-                            </option>
-                        ))}
-                    </select>
-                    {!isPlay ? (
-                        <button onClick={this.handlePlay}>PLAY</button>
-                    ) : (
-                        <button onClick={this.handleBreakGame}>Break game</button>
-                    )}
-                </header>
-                <ul className={style.board}>
-                    {board && board.length ? (
-                        board.map((square, index) => (
-                            <Square
-                                size={`${100 / boardSize}%`}
-                                status={square.status}
-                                // eslint-disable-next-line
-                                        key={index}
-                                handeClick={this.handleClick(index)}
-                            />
-                        ))
-                    ) : (
-                        <li>Somethink happed 8(</li>
-                    )}
-                </ul>
-            </main>
-        ) : null;
-    }
+    return settings ? (
+        <main className={style.game}>
+            <header className={style.header}>
+                <h1>Game In Dots</h1>
+                <select
+                    name="Mode"
+                    aria-label="Game modes"
+                    disabled={isPlay ? "disabled" : null}
+                    value={mode || modes[0]}
+                    onChange={handleChangeMode}
+                >
+                    {modes.map((el) => (
+                        <option key={el} value={el}>
+                            {fromCamelcaseToText(el)}
+                        </option>
+                    ))}
+                </select>
+                {!isPlay ? (
+                    <button type="button" onClick={handlePlay}>
+                        PLAY
+                    </button>
+                ) : (
+                    <button type="button" onClick={handleBreakGame}>
+                        Break game
+                    </button>
+                )}
+            </header>
+            <ul className={style.board}>
+                {board?.length ? (
+                    board.map((square, index) => (
+                        <Square
+                            size={`${100 / boardSize}%`}
+                            status={square.status}
+                            key={index.toString()}
+                            handeClick={handleClick(index)}
+                        />
+                    ))
+                ) : (
+                    <li>Somethink happed 8(</li>
+                )}
+            </ul>
+        </main>
+    ) : null;
 }
+
+export default Game;

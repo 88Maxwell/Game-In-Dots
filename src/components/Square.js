@@ -27,13 +27,8 @@ function Square({ status, size, handeClick }) {
         backgroundColor
     };
 
-    return (
-        <li
-            style={inlineStyle}
-            className={style.square}
-            onClick={handeClick}
-        />
-    );
+    // eslint-disable-next-line
+    return <li style={inlineStyle} className={style.square} onClick={handeClick} />; // TODO enable eslint for this line
 }
 
 Square.propTypes = {
