@@ -16,6 +16,7 @@
     top: 5px;
 }
 .title:after {
+    /* TODO delete prefixes */
     background-image: -webkit-linear-gradient(
         left top,
         transparent 0%,
@@ -28,7 +29,8 @@
     );
     
     background-size: 4px 4px;
-    -webkit-background-clip: text;
+    /* TODO delete prefixes */
+    -webkit-background-clip: text; 
     -webkit-text-fill-color: transparent;
     z-index: -5;
     display: block;
@@ -43,6 +45,7 @@
 }
 
 .title:before {
+    /* TODO delete prefixes */
     background-image: -webkit-linear-gradient(
         left top,
         transparent 0%,
@@ -54,6 +57,7 @@
         #555 75%
     );
     background-size: 4px 4px;
+    /* TODO delete prefixes */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     z-index: -5;

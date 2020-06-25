@@ -47,6 +47,7 @@
     margin-bottom: 10px;
     text-transform: uppercase;
     box-sizing: border-box;
+    background-color: white;
     font-weight: bold;
     padding: 10px 0;
     border: none;
@@ -54,7 +55,14 @@
 }
 .playButton:focus {
     outline: none;
+    border: none;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7) inset;
+}
+
+.playButton:hover {
+    outline: none;
+    background-color: white;
+    border: none;
 }
 
 .board {
